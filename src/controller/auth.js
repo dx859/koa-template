@@ -1,7 +1,16 @@
 const auth = require('../services/auth');
 
 exports.signIn = async ctx => {
-  ctx.body = await auth.users();
+  const params = ctx.validate({
+    username: { required: true, name: '用户名' },
+    password: { required: true, name: '密码' }
+  });
+
+  let user = await auth.login(params);
+  if (!user) {
+    ctx.throw(422, '用户名密码错误');
+  }
+  ctx.body = user;
 };
 
 exports.signUp = async ctx => {
