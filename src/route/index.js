@@ -28,6 +28,7 @@ const controller = requireController(path.join(__dirname, '..', 'controller'));
 
 const router = new Router();
 
-router.get('/', controller.auth.info);
+router.get('/', controller.auth.signIn);
+router.post('/auth/sign-up', controller.auth.signUp);
 
 module.exports = router;

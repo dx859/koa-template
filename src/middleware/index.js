@@ -6,6 +6,8 @@ const session = require('koa-session');
 
 const errorHanding = require('./errorHanding');
 const page404 = require('./page404');
+const validate = require('./validate');
+
 const router = require('../route');
 
 module.exports = function(app, config) {
@@ -15,6 +17,7 @@ module.exports = function(app, config) {
     bodyparser({ enableTypes: ['json', 'form', 'text'] }),
     json(),
     session(config.sessionConfig, app),
+    validate,
     router.routes(),
     router.allowedMethods(),
     page404

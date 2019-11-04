@@ -34,5 +34,13 @@ module.exports = {
     httpOnly: true /** (boolean) httpOnly or not (default true) */,
     signed: true /** (boolean) signed or not (default true) */,
     rolling: false
+  },
+  db: {
+    host: process.env.DB_HOST || 'localhost',
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASS || 'root',
+    port: process.env.DB_PORT || '3306',
+    database: process.env.DB_NAME || 'koa-template',
+    connectionLimit: 5
   }
 };
