@@ -60,6 +60,31 @@ class DB {
     );
     return !count[0].count;
   }
+
+  async queryPaging(
+    sql,
+    data = [],
+    { countSql, page = 1, pageSize = 10 } = {}
+  ) {
+    if (!countSql) {
+      countSql = sql.replace(/^select (.+) from/i, function(sql, q) {
+        return `select COUNT(${q}) count from`;
+      });
+    }
+    let total = (await this.query(countSql, data))[0].count;
+    let list = [];
+    if (total !== 0) {
+      page = isNaN(page) ? 1 : parseInt(page);
+      pageSize = isNaN(pageSize) ? 10 : parseInt(pageSize);
+      page = page < 1 ? 1 : page;
+      pageSize = pageSize < 1 ? 1 : pageSize;
+      pageSize = pageSize > 100 ? 100 : pageSize;
+      sql = sql += ` LIMIT ?, ?`;
+      data = data.concat([(page - 1) * pageSize, pageSize]);
+      list = await this.query(sql, data);
+    }
+    return { list, page, pageSize, total };
+  }
 }
 
 module.exports = new DB(config.db);
