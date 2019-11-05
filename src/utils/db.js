@@ -54,6 +54,7 @@ class DB {
   }
 
   async unique(table, key, value) {
+    key = '`' + key + '`';
     const count = await this.query(
       `SELECT COUNT(id) count FROM ${table} WHERE ${key}=?`,
       [value]

@@ -7,6 +7,7 @@ const controller = requireController(path.join(__dirname, '..', 'controller'));
 
 const router = new Router();
 const postRouter = new Router();
+const categoryRouter = new Router();
 
 router.post('/auth/sign-in', controller.auth.signIn);
 router.post('/auth/sign-up', controller.auth.signUp);
@@ -17,7 +18,14 @@ postRouter.post('/delete/:id', controller.post.delete);
 postRouter.post('/create', controller.post.create);
 postRouter.post('/update/:id', controller.post.update);
 
+categoryRouter.get('/', controller.category.index);
+categoryRouter.post('/create', controller.category.create);
+categoryRouter.post('/update/:id', controller.category.update);
+categoryRouter.post('/delete/:id', controller.category.delete);
+
 router.use('/post', authorize, postRouter.routes());
+router.use('/category', authorize, categoryRouter.routes());
+
 module.exports = router;
 
 function requireController(filePath, controller = {}) {
