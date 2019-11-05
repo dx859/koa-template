@@ -11,7 +11,11 @@ const postRouter = new Router();
 router.post('/auth/sign-in', controller.auth.signIn);
 router.post('/auth/sign-up', controller.auth.signUp);
 
-postRouter.get('/list', controller.post.list);
+postRouter.get('/', controller.post.list);
+postRouter.get('/detail/:id', controller.post.detail);
+postRouter.post('/delete/:id', controller.post.delete);
+postRouter.post('/create', controller.post.create);
+postRouter.post('/update/:id', controller.post.update);
 
 router.use('/post', authorize, postRouter.routes());
 module.exports = router;
