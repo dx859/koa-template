@@ -1,4 +1,5 @@
 const auth = require('../services/auth');
+const { getAttrs } = require('../utils/common');
 
 exports.signIn = async ctx => {
   const params = ctx.validate({
@@ -10,6 +11,7 @@ exports.signIn = async ctx => {
   if (!user) {
     ctx.throw(422, '用户名密码错误');
   }
+  ctx.session.user = getAttrs(user, ['id', 'username', 'email']);
   ctx.body = user;
 };
 
@@ -28,7 +30,9 @@ exports.signUp = async ctx => {
     ctx.throw(422, '邮箱已存在');
   }
 
-  ctx.body = {
-    response: await auth.register(params)
-  };
+  let userId = await auth.register(params);
+  let user = await auth.getUser(userId);
+
+  ctx.session.user = getAttrs(user, ['id', 'username', 'email']);
+  ctx.body = user;
 };

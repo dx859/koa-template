@@ -16,13 +16,25 @@ class DB {
     this.conn = mysql.createConnection(opts);
   }
 
-  query(sql, data) {
+  query(
+    sql,
+    data,
+    {
+      typeCast = function(field, next) {
+        if (field.type === 'DATETIME') {
+          return field.string();
+        }
+        return next();
+      }
+    } = {}
+  ) {
     return new Promise((resolve, reject) => {
       let startTime = Date.now();
       let query = this.conn.query(
         {
           sql,
-          values: data
+          values: data,
+          typeCast
         },
         function(err, results) {
           if ((process.env.NODE_ENV = 'development')) {

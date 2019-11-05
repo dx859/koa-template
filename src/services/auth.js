@@ -1,8 +1,13 @@
 const db = require('../utils/db');
 const { passwordHash } = require('../utils/security');
 
-exports.users = async () => {
-  return await db.query(`SELECT * FROM b_user`);
+const userOpenAttrs = ['id', 'username', 'email', 'created_at', 'updated_at'];
+
+exports.getUser = async id => {
+  return (await db.query(`SELECT ?? FROM b_user WHERE id=?`, [
+    userOpenAttrs,
+    id
+  ]))[0];
 };
 
 exports.validatePassword = async (username, password) => {
@@ -19,8 +24,8 @@ exports.unique = async (key, value) => {
 exports.login = async data => {
   data.password = passwordHash(data.password);
   let response = await db.query(
-    `SELECT * FROM b_user WHERE username=? AND password=? LIMIT 1`,
-    [data.username, data.password]
+    `SELECT ?? FROM b_user WHERE username=? AND password=? LIMIT 1`,
+    [userOpenAttrs, data.username, data.password]
   );
   return response[0];
 };
