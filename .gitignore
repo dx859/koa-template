@@ -15,3 +15,5 @@ yarn-error.log*
 # ide
 /.idea
 /.vscode
+
+local.json

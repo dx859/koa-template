@@ -1,5 +1,5 @@
 const mysql = require('mysql');
-const config = require('../config');
+const config = require('config');
 
 class DB {
   constructor(opts) {
@@ -88,4 +88,4 @@ class DB {
   }
 }
 
-module.exports = new DB(config.db);
+module.exports = new DB(config.get('dbConfig'));

@@ -1,4 +1,5 @@
 const compose = require('koa-compose');
+const path = require('path');
 const favicon = require('koa-favicon');
 const bodyparser = require('koa-bodyparser');
 const json = require('koa-json');
@@ -13,10 +14,10 @@ const router = require('../route');
 module.exports = function(app, config) {
   return compose([
     errorHanding,
-    favicon(config.faviconPath),
+    favicon(path.join(__dirname, '../../public', config.get('faviconPath'))),
     bodyparser({ enableTypes: ['json', 'form', 'text'] }),
     json(),
-    session(config.sessionConfig, app),
+    session(Object.assign({}, config.get('sessionConfig')), app),
     validate,
     router.routes(),
     router.allowedMethods(),

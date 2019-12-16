@@ -1,0 +1,22 @@
+{
+  "port": 3000,
+  "keys": ["koa this is for you"],
+  "name": "koa-template",
+  "faviconPath": "favicon.ico",
+  "sessionConfig": {
+    "key": "koa:sess",
+    "maxAge": 86400000,
+    "overwrite": true,
+    "httpOnly": true,
+    "signed": true,
+    "rolling": false
+  },
+  "dbConfig": {
+    "host": "localhost",
+    "user": "root",
+    "password": "root",
+    "port": "3306",
+    "database": "koa-template",
+    "connectionLimit": 5
+  }
+}
