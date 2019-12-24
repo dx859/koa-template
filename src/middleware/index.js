@@ -6,11 +6,11 @@ const bodyparser = require('koa-bodyparser');
 const json = require('koa-json');
 const session = require('koa-session');
 
-const errorHanding = require('./errorHanding');
+
 const page404 = require('./page404');
 const validate = require('./validate');
 
-const router = require('../route/index.bak');
+const router = require('../route/index');
 
 module.exports = function(app, config) {
   return compose([
