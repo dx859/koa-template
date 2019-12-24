@@ -37,7 +37,7 @@ class DB {
           typeCast
         },
         function(err, results) {
-          if ((process.env.NODE_ENV = 'development')) {
+          if (process.env.NODE_ENV === 'development') {
             let sqlTime = Date.now() - startTime;
             console.log(query.sql, `: ${sqlTime}ms`);
           }
@@ -88,4 +88,4 @@ class DB {
   }
 }
 
-module.exports = new DB(config.get('dbConfig'));
+module.exports = new DB();
