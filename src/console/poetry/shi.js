@@ -1,19 +1,14 @@
 const fs = require('fs');
 const path = require('path');
+const config = require('config');
 const { objT2S } = require('./utils');
 const { traditional2Simplified } = require('./utils');
 const db = require('../../utils/db');
-db.configure({
-  host: 'localhost',
-  user: 'root',
-  password: 'root',
-  database: 'poetry',
-  waitForConnections: true,
-  connectionLimit: 2,
-  queueLimit: 0
-});
-const shiDir = 'D:/workspace/koa/chinese-poetry-master/json';
-const strainDir = 'D:/workspace/koa/chinese-poetry-master/strains/json';
+
+db.configure(config.get('dbConfig'));
+
+const shiDir = path.join(config.get('poetryDir'), '/json');
+const strainDir = path.join(config.get('poetryDir'), '/strains/json');
 function getAuthors(type = 'tang') {
   let tang = fs.readFileSync(
     path.join(shiDir, `authors.${type}.json`),
@@ -72,39 +67,69 @@ function getPoem(type = 'tang') {
   return poems;
 }
 
-async function insertPoem(poems) {
+async function insertPoem(poems, length = 1000) {
   const errors = [];
-  for (let i = 0; i < poems.length; i++) {
+  let number = 0;
+  for (let i = 0; i < length; i++) {
     let poem = poems[i];
+    if (!poem) {
+      break;
+    }
     const { author, paragraphs, strains, title, year_range } = poem;
     try {
       const result = await db.query(
-        `insert into poem (author, title, year_range) values (?, ?, ?)`,
+        `insert into p_poem (author, title, year_range) values (?, ?, ?)`,
         [author, title, year_range]
       );
       const id = result.insertId;
       for (let i = 0; i < paragraphs.length; i++) {
         await db.query(
-          `insert into poem_paragraph (poem_id, paragraph, strain, sort) values (?,?,?,?)`,
+          `insert into p_poem_paragraph (poem_id, paragraph, strain, sort) values (?,?,?,?)`,
           [id, paragraphs[i], strains[i], i]
         );
       }
-      console.log(i);
+      poem.insertId = id;
+
     } catch (e) {
-      console.log(e);
+
       errors.push(poem);
     }
+    number++;
   }
   db.end();
-  return errors;
+  return [errors, number];
 }
 
-async function main() {
-  let errors = await insertPoem(getPoem('song'));
-  if (errors.length > 0) {
-    fs.writeFileSync('./error.json', JSON.stringify(errors), 'utf8');
-  }
+function writePoem() {
+  let tang = getPoem('tang')
+  let song = getPoem('song');
+  let all = tang.concat(song);
+  all.map(item => {
+    item.insertId = null
+    return item;
+  })
+  fs.writeFileSync(path.join(__dirname, './.tmp_all.json'), JSON.stringify(all), 'utf8');
 }
 
-module.exports = main;
-if (!module.parent) main();
+function getPoems() {
+  let poems = fs.readFileSync(path.join(__dirname, './.tmp_all.json'), 'utf8');
+  poems = JSON.parse(poems)
+  return poems.filter(item => !item.insertId)
+}
+
+async function main(number = 1000) {
+
+  let poems = getPoems();
+  const [errors, insertNum] = await insertPoem(poems, number);
+  fs.writeFileSync(path.join(__dirname, './.tmp_all.json'), JSON.stringify(poems), 'utf8');
+  fs.writeFileSync(path.join(__dirname, './.tmp_error.json'), JSON.stringify(errors), 'utf8');
+  fs.writeFileSync(path.join(__dirname, './.tmp_log.json'), JSON.stringify(insertNum), 'utf8');
+}
+
+exports.main = main;
+exports.writePoem = writePoem
+exports.test = (a, b) => {
+  console.log(a, b)
+}
+
+
