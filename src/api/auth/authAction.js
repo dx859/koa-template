@@ -36,3 +36,8 @@ exports.signUp = async ctx => {
   ctx.session.user = getAttrs(user, ['id', 'username', 'email']);
   ctx.body = user;
 };
+
+exports.logout = async ctx => {
+  ctx.session.user = null;
+  ctx.body = {};
+};
