@@ -67,12 +67,15 @@ class DB {
     data = [],
     { countSql, page = 1, pageSize = 10 } = {}
   ) {
+    sql = sql.trim()
     if (!countSql) {
-      countSql = sql.replace(/^select (.+) from/i, function(sql, q) {
+      countSql = sql.replace(/^select (.+) from/ig, function(sql, q) {
         return `select COUNT(${q}) count from`;
       });
     }
+
     let total = (await this.query(countSql, data))[0].count;
+
     let list = [];
     if (total !== 0) {
       page = isNaN(page) ? 1 : parseInt(page);
