@@ -6,17 +6,20 @@ const getAttrs = (obj, attributes) => {
   return tmp;
 };
 
+function array2children(array, parent_id = null) {
+  return array
+    .filter(item => item.parent_id === parent_id)
+    .map(item => {
+      let children = array2children(array, item.id);
+      if (children.length > 0) {
+        item.children = children;
+      }
 
-function array2children(array,parent_id = null){
-
-  return array.filter(item=>item.parent_id === parent_id).map(item=>{
-    item.children = array2children(array, item.id)
-
-    return item
-  })
+      return item;
+    });
 }
 
-module.exports ={
+module.exports = {
   getAttrs,
-  array2children,
-}
+  array2children
+};
